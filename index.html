@@ -108,8 +108,8 @@
         function renderFeed() {
             feed.innerHTML = '';
             let filtered = reports.filter(r => {
-                if (filterCity.value !== 'Todas' && r.city !== filterCity.value) return false;
-                if (filterNeighborhood.value !== 'Todos' && r.neighborhood !== filterNeighborhood.value) return false;
+                if (filterCity.value !== 'cidade' && r.city !== filterCity.value) return false;
+                if (filterNeighborhood.value !== 'bairro' && r.neighborhood !== filterNeighborhood.value) return false;
                 if (filterSearch.value && !(`${r.title} ${r.description}`.toLowerCase().includes(filterSearch.value.toLowerCase()))) return false;
                 return true;
             });
@@ -191,3 +191,4 @@
 
 
 </html>
+
