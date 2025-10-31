@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReclameCidade</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow p-3 sticky top-0 z-10 flex justify-between items-center">
+        <h1 class="text-xl font-bold text-indigo-600">ReclameCidade</h1>
+        <button id="btn-add" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-500 transition">+
+            Nova Reclamação</button>
+    </header>
+
+    <!-- Filtros -->
+    <section class="bg-white p-3 flex flex-wrap gap-2 shadow mt-2 mx-2 rounded-lg">
+        <select id="filterCity" class="border rounded-md px-2 py-1 text-sm hover:border-indigo-500 transition">
+            <option value="Todas">Todas as cidades</option>
+        </select>
+        <select id="filterNeighborhood" class="border rounded-md px-2 py-1 text-sm hover:border-indigo-500 transition">
+            <option value="Todos">Todos os bairros</option>
+        </select>
+        <input type="text" id="filterSearch" placeholder="Buscar..."
+            class="border rounded-md px-2 py-1 flex-1 text-sm hover:border-indigo-500 transition">
+        <button id="clearFilters"
+            class="px-3 py-1 border rounded-md hover:bg-gray-100 transition text-sm">Limpar</button>
+    </section>
+
+    <!-- Feed de reclamações -->
+    <main id="feed" class="flex-1 p-3 grid gap-3 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></main>
+
+    <!-- Modal de formulário -->
+    <div id="modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <form id="form" class="bg-white rounded-xl p-4 w-full max-w-md relative shadow-2xl">
+            <h2 class="text-lg font-semibold mb-3 text-indigo-600">Nova Reclamação</h2>
+            <label class="block mb-1 text-sm font-medium">Título</label>
+            <input type="text" id="title" required
+                class="w-full border rounded-md px-2 py-1 mb-2 text-sm focus:ring-2 focus:ring-indigo-300">
+
+            <label class="block mb-1 text-sm font-medium">Descrição</label>
+            <textarea id="description" required
+                class="w-full border rounded-md px-2 py-1 mb-2 h-20 text-sm focus:ring-2 focus:ring-indigo-300"></textarea>
+
+            <label class="block mb-1 text-sm font-medium">Cidade</label>
+            <input type="text" id="city" required
+                class="w-full border rounded-md px-2 py-1 mb-2 text-sm focus:ring-2 focus:ring-indigo-300">
+
+            <label class="block mb-1 text-sm font-medium">Bairro</label>
+            <input type="text" id="neighborhood" required
+                class="w-full border rounded-md px-2 py-1 mb-2 text-sm focus:ring-2 focus:ring-indigo-300">
+
+            <label class="block mb-1 text-sm font-medium">Categoria</label>
+            <input type="text" id="category" placeholder="Ex: Limpeza, Iluminação"
+                class="w-full border rounded-md px-2 py-1 mb-2 text-sm focus:ring-2 focus:ring-indigo-300">
+
+            <div class="flex justify-end gap-2 mt-3">
+                <button type="button" id="cancelBtn"
+                    class="px-3 py-1 border rounded-md hover:bg-gray-100 transition text-sm">Cancelar</button>
+                <button type="submit"
+                    class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 transition text-sm">Enviar</button>
+            </div>
+
+            <!-- Firebase Realtime Database placeholder -->
+            <!--
+      Para integrar com Firebase:
+      1. Adicione SDK Firebase
+      2. Inicialize Firebase
+      3. No submit do formulário, use:
+         push(ref(db, 'reclamacoes'), { title, description, city, neighborhood, category, createdAt });
+    -->
+        </form>
+    </div>
+
+    <script>
+        // Elementos
+        const modal = document.getElementById('modal');
+        const btnAdd = document.getElementById('btn-add');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const form = document.getElementById('form');
+        const feed = document.getElementById('feed');
+        const filterCity = document.getElementById('filterCity');
+        const filterNeighborhood = document.getElementById('filterNeighborhood');
+        const filterSearch = document.getElementById('filterSearch');
+        const clearFilters = document.getElementById('clearFilters');
+
+        // Estado
+        let reports = JSON.parse(localStorage.getItem('reclameCidadeReports') || '[]');
+
+        // Funções
+        function saveReports() {
+            localStorage.setItem('reclameCidadeReports', JSON.stringify(reports));
+        }
+
+        function categoryColor(cat) {
+            switch (cat.toLowerCase()) {
+                case 'limpeza': return 'bg-green-100 text-green-800';
+                case 'iluminação': return 'bg-yellow-100 text-yellow-800';
+                case 'pavimentação': return 'bg-red-100 text-red-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function renderFeed() {
+            feed.innerHTML = '';
+            let filtered = reports.filter(r => {
+                if (filterCity.value !== 'Todas' && r.city !== filterCity.value) return false;
+                if (filterNeighborhood.value !== 'Todos' && r.neighborhood !== filterNeighborhood.value) return false;
+                if (filterSearch.value && !(`${r.title} ${r.description}`.toLowerCase().includes(filterSearch.value.toLowerCase()))) return false;
+                return true;
+            });
+
+            filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            if (filtered.length === 0) {
+                feed.innerHTML = '<div class="col-span-full text-center text-gray-500 p-4 bg-white rounded-xl shadow">Nenhuma reclamação encontrada</div>';
+                return;
+            }
+
+            filtered.forEach(r => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-1.5 rounded-xl shadow hover:shadow-md transition flex flex-col max-h-32 overflow-hidden';
+                card.innerHTML = `
+      <h3 class="font-semibold text-xs truncate">${r.title}</h3>
+      <p class="text-[10px] text-gray-700 my-0.5 truncate">${r.description}</p>
+      <div class="flex items-center justify-between text-[8px] text-gray-500 mb-0.5">
+        <span class="truncate">${r.city} — ${r.neighborhood}</span>
+        <span class="px-1 py-0.5 rounded-full ${categoryColor(r.category)} text-[8px] truncate">${r.category || 'Outros'}</span>
+      </div>
+      <div class="text-[7px] text-gray-400 truncate">Criado: ${r.createdAt}</div>
+    `;
+                feed.appendChild(card);
+            });
+
+
+            renderFiltersOptions();
+        }
+
+        function renderFiltersOptions() {
+            const cities = ['Todas', ...new Set(reports.map(r => r.city))];
+            filterCity.innerHTML = cities.map(c => `<option value="${c}">${c}</option>`).join('');
+            filterCity.value = filterCity.value || 'Todas';
+
+            const neighborhoods = ['Todos', ...new Set(reports.filter(r => filterCity.value === 'Todas' ? true : r.city === filterCity.value).map(r => r.neighborhood))];
+            filterNeighborhood.innerHTML = neighborhoods.map(n => `<option value="${n}">${n}</option>`).join('');
+            filterNeighborhood.value = filterNeighborhood.value || 'Todos';
+        }
+
+        // Eventos
+        btnAdd.onclick = () => modal.classList.remove('hidden');
+        cancelBtn.onclick = () => modal.classList.add('hidden');
+
+        form.onsubmit = e => {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const city = document.getElementById('city').value;
+            const neighborhood = document.getElementById('neighborhood').value;
+            const category = document.getElementById('category').value;
+            const createdAt = new Date().toISOString().slice(0, 10);
+
+            const newReport = { title, description, city, neighborhood, category, createdAt };
+            reports.push(newReport);
+            saveReports();
+            renderFeed();
+            form.reset();
+            modal.classList.add('hidden');
+
+            // 🚀 Aqui tu pode adicionar o código do Firebase Realtime Database
+        }
+
+        filterCity.onchange = () => renderFeed();
+        filterNeighborhood.onchange = () => renderFeed();
+        filterSearch.oninput = () => renderFeed();
+        clearFilters.onclick = () => {
+            filterCity.value = 'Todas';
+            filterNeighborhood.value = 'Todos';
+            filterSearch.value = '';
+            renderFeed();
+        }
+
+        // Inicial
+        renderFeed();
+    </script>
+
+</body>
+
+</html>
