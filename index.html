@@ -2,192 +2,222 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuidado Integral</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuidado Integral</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Animações suaves */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fadeIn {
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    /* Modal fade */
+    .modal-show {
+      display: flex !important;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+  </style>
 </head>
 
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-gray-50 min-h-screen flex flex-col">
 
-    <!-- Header -->
-    <header class="bg-white shadow p-3 sticky top-0 z-10 flex justify-between items-center">
-        <h1 class="text-xl font-bold text-indigo-600">Cuidado Integral</h1>
-        <button id="btn-add" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-500 transition">+
-            Nova Reclamação</button>
-    </header>
+  <!-- Header -->
+  <header class="bg-white/90 backdrop-blur-sm shadow-sm p-4 sticky top-0 z-10 flex justify-between items-center border-b border-gray-200">
+    <h1 class="text-2xl font-semibold text-gray-800 tracking-tight">🌿 Cuidado Integral</h1>
+    <button id="btn-add"
+      class="bg-indigo-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-400 active:scale-95 transition transform shadow-sm">+ Nova
+      Reclamação</button>
+  </header>
 
-    <!-- Filtros -->
-    <section class="bg-white p-3 flex flex-wrap gap-2 shadow mt-2 mx-2 rounded-lg">
-        <select id="filterCity" class="border rounded-md px-2 py-1 text-sm hover:border-indigo-500 transition">
-            <option value="Todas">Todas as cidades</option>
-        </select>
-        <select id="filterNeighborhood" class="border rounded-md px-2 py-1 text-sm hover:border-indigo-500 transition">
-            <option value="Todos">Todos os bairros</option>
-        </select>
-        <input type="text" id="filterSearch" placeholder="Buscar..."
-            class="border rounded-md px-2 py-1 flex-1 text-sm hover:border-indigo-500 transition">
-        <button id="clearFilters"
-            class="px-3 py-1 border rounded-md hover:bg-gray-100 transition text-sm">Limpar</button>
-    </section>
+  <!-- Filtros -->
+  <section
+    class="bg-white/80 backdrop-blur-sm p-3 flex flex-wrap gap-3 shadow-sm mt-3 mx-3 rounded-xl border border-gray-200">
+    <select id="filterCity"
+      class="border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-300 transition bg-gray-50">
+      <option value="Todas">Todas as cidades</option>
+    </select>
+    <select id="filterNeighborhood"
+      class="border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-300 transition bg-gray-50">
+      <option value="Todos">Todos os bairros</option>
+    </select>
+    <input type="text" id="filterSearch" placeholder="Buscar..."
+      class="border rounded-md px-3 py-2 flex-1 text-sm focus:ring-2 focus:ring-indigo-300 transition bg-gray-50">
+    <button id="clearFilters"
+      class="px-3 py-2 border rounded-md hover:bg-gray-100 transition text-sm text-gray-600">Limpar</button>
+  </section>
 
-    <!-- Feed de reclamações -->
-    <main id="feed" class="flex-1 p-3 grid gap-3 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></main>
+  <!-- Feed -->
+  <main id="feed"
+    class="flex-1 p-4 grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 transition-all"></main>
 
-    <!-- Modal de formulário -->
-    <div id="modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 backdrop-blur-sm">
-        <form id="form" class="bg-white rounded-xl p-4 w-full max-w-md relative shadow-2xl">
-            <h2 class="text-lg font-semibold mb-3 text-indigo-600">Nova Reclamação</h2>
-            <label class="block mb-1 text-sm font-medium">Título</label>
-            <input type="text" id="title" required
-                class="w-full border rounded-md px-2 py-1 mb-2 text-sm focus:ring-2 focus:ring-indigo-300">
+  <!-- Modal -->
+  <div id="modal"
+    class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 backdrop-blur-sm transition-all">
+    <form id="form"
+      class="bg-white rounded-2xl p-5 w-full max-w-md relative shadow-2xl border border-gray-200 animate-fadeIn">
+      <h2 class="text-xl font-semibold mb-4 text-indigo-600 text-center">Nova Reclamação</h2>
 
-            <label class="block mb-1 text-sm font-medium">Descrição</label>
-            <textarea id="description" required
-                class="w-full border rounded-md px-2 py-1 mb-2 h-20 text-sm focus:ring-2 focus:ring-indigo-300"></textarea>
+      <label class="block mb-1 text-sm font-medium text-gray-700">Título</label>
+      <input type="text" id="title" required
+        class="w-full border rounded-md px-3 py-2 mb-3 text-sm focus:ring-2 focus:ring-indigo-300 bg-gray-50">
 
-            <label class="block mb-1 text-sm font-medium">Cidade</label>
-            <input type="text" id="city" required
-                class="w-full border rounded-md px-2 py-1 mb-2 text-sm focus:ring-2 focus:ring-indigo-300">
+      <label class="block mb-1 text-sm font-medium text-gray-700">Descrição</label>
+      <textarea id="description" required
+        class="w-full border rounded-md px-3 py-2 mb-3 h-20 text-sm focus:ring-2 focus:ring-indigo-300 bg-gray-50"></textarea>
 
-            <label class="block mb-1 text-sm font-medium">Bairro</label>
-            <input type="text" id="neighborhood" required
-                class="w-full border rounded-md px-2 py-1 mb-2 text-sm focus:ring-2 focus:ring-indigo-300">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block mb-1 text-sm font-medium text-gray-700">Cidade</label>
+          <input type="text" id="city" required
+            class="w-full border rounded-md px-3 py-2 mb-3 text-sm focus:ring-2 focus:ring-indigo-300 bg-gray-50">
+        </div>
 
-            <label class="block mb-1 text-sm font-medium">Categoria</label>
-            <input type="text" id="category" placeholder="Ex: Limpeza, Iluminação"
-                class="w-full border rounded-md px-2 py-1 mb-2 text-sm focus:ring-2 focus:ring-indigo-300">
-
-            <div class="flex justify-end gap-2 mt-3">
-                <button type="button" id="cancelBtn"
-                    class="px-3 py-1 border rounded-md hover:bg-gray-100 transition text-sm">Cancelar</button>
-                <button type="submit"
-                    class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 transition text-sm">Enviar</button>
-            </div>
-
-            <!-- Firebase Realtime Database placeholder -->
-            <!--
-      Para integrar com Firebase:
-      1. Adicione SDK Firebase
-      2. Inicialize Firebase
-      3. No submit do formulário, use:
-         push(ref(db, 'reclamacoes'), { title, description, city, neighborhood, category, createdAt });
-    -->
-        </form>
-    </div>
-
-    <script>
-        // Elementos
-        const modal = document.getElementById('modal');
-        const btnAdd = document.getElementById('btn-add');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const form = document.getElementById('form');
-        const feed = document.getElementById('feed');
-        const filterCity = document.getElementById('filterCity');
-        const filterNeighborhood = document.getElementById('filterNeighborhood');
-        const filterSearch = document.getElementById('filterSearch');
-        const clearFilters = document.getElementById('clearFilters');
-
-        // Estado
-        let reports = JSON.parse(localStorage.getItem('reclameCidadeReports') || '[]');
-
-        // Funções
-        function saveReports() {
-            localStorage.setItem('reclameCidadeReports', JSON.stringify(reports));
-        }
-
-        function categoryColor(cat) {
-            switch (cat.toLowerCase()) {
-                case 'limpeza': return 'bg-green-100 text-green-800';
-                case 'iluminação': return 'bg-yellow-100 text-yellow-800';
-                case 'pavimentação': return 'bg-red-100 text-red-800';
-                default: return 'bg-gray-100 text-gray-800';
-            }
-        }
-
-        function renderFeed() {
-            feed.innerHTML = '';
-            let filtered = reports.filter(r => {
-                if (filterCity.value !== 'Todas' && r.city !== filterCity.value) return false;
-                if (filterNeighborhood.value !== 'Todos' && r.neighborhood !== filterNeighborhood.value) return false;
-                if (filterSearch.value && !(`${r.title} ${r.description}`.toLowerCase().includes(filterSearch.value.toLowerCase()))) return false;
-                return true;
-            });
-
-            filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-            if (filtered.length === 0) {
-                feed.innerHTML = '<div class="col-span-full text-center text-gray-500 p-4 bg-white rounded-xl shadow">Nenhuma reclamação encontrada</div>';
-                return;
-            }
-
-            filtered.forEach(r => {
-                const card = document.createElement('div');
-                card.className = 'bg-white p-1.5 rounded-xl shadow hover:shadow-md transition flex flex-col max-h-32 overflow-hidden';
-                card.innerHTML = `
-      <h3 class="font-semibold text-xs truncate">${r.title}</h3>
-      <p class="text-[10px] text-gray-700 my-0.5 truncate">${r.description}</p>
-      <div class="flex items-center justify-between text-[8px] text-gray-500 mb-0.5">
-        <span class="truncate">${r.city} — ${r.neighborhood}</span>
-        <span class="px-1 py-0.5 rounded-full ${categoryColor(r.category)} text-[8px] truncate">${r.category || 'Outros'}</span>
+        <div>
+          <label class="block mb-1 text-sm font-medium text-gray-700">Bairro</label>
+          <input type="text" id="neighborhood" required
+            class="w-full border rounded-md px-3 py-2 mb-3 text-sm focus:ring-2 focus:ring-indigo-300 bg-gray-50">
+        </div>
       </div>
-      <div class="text-[7px] text-gray-400 truncate">Criado: ${r.createdAt}</div>
-    `;
-                feed.appendChild(card);
-            });
 
+      <label class="block mb-1 text-sm font-medium text-gray-700">Categoria</label>
+      <input type="text" id="category" placeholder="Ex: Limpeza, Iluminação"
+        class="w-full border rounded-md px-3 py-2 mb-3 text-sm focus:ring-2 focus:ring-indigo-300 bg-gray-50">
 
-            renderFiltersOptions();
-        }
+      <div class="flex justify-end gap-2 mt-3">
+        <button type="button" id="cancelBtn"
+          class="px-4 py-2 border rounded-md hover:bg-gray-100 transition text-sm text-gray-600">Cancelar</button>
+        <button type="submit"
+          class="px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-400 transition text-sm shadow-sm active:scale-95">Enviar</button>
+      </div>
+    </form>
+  </div>
 
-        function renderFiltersOptions() {
-            const cities = ['Todas', ...new Set(reports.map(r => r.city))];
-            filterCity.innerHTML = cities.map(c => `<option value="${c}">${c}</option>`).join('');
-            filterCity.value = filterCity.value || 'Todas';
+  <script>
+    // Elementos
+    const modal = document.getElementById('modal');
+    const btnAdd = document.getElementById('btn-add');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const form = document.getElementById('form');
+    const feed = document.getElementById('feed');
+    const filterCity = document.getElementById('filterCity');
+    const filterNeighborhood = document.getElementById('filterNeighborhood');
+    const filterSearch = document.getElementById('filterSearch');
+    const clearFilters = document.getElementById('clearFilters');
 
-            const neighborhoods = ['Todos', ...new Set(reports.filter(r => filterCity.value === 'Todas' ? true : r.city === filterCity.value).map(r => r.neighborhood))];
-            filterNeighborhood.innerHTML = neighborhoods.map(n => `<option value="${n}">${n}</option>`).join('');
-            filterNeighborhood.value = filterNeighborhood.value || 'Todos';
-        }
+    // Estado
+    let reports = JSON.parse(localStorage.getItem('reclameCidadeReports') || '[]');
 
-        // Eventos
-        btnAdd.onclick = () => modal.classList.remove('hidden');
-        cancelBtn.onclick = () => modal.classList.add('hidden');
+    // Funções
+    function saveReports() {
+      localStorage.setItem('reclameCidadeReports', JSON.stringify(reports));
+    }
 
-        form.onsubmit = e => {
-            e.preventDefault();
-            const title = document.getElementById('title').value;
-            const description = document.getElementById('description').value;
-            const city = document.getElementById('city').value;
-            const neighborhood = document.getElementById('neighborhood').value;
-            const category = document.getElementById('category').value;
-            const createdAt = new Date().toISOString().slice(0, 10);
+    function categoryColor(cat) {
+      switch ((cat || '').toLowerCase()) {
+        case 'limpeza': return 'bg-emerald-100 text-emerald-800';
+        case 'iluminação': return 'bg-amber-100 text-amber-800';
+        case 'pavimentação': return 'bg-rose-100 text-rose-800';
+        default: return 'bg-gray-100 text-gray-700';
+      }
+    }
 
-            const newReport = { title, description, city, neighborhood, category, createdAt };
-            reports.push(newReport);
-            saveReports();
-            renderFeed();
-            form.reset();
-            modal.classList.add('hidden');
+    function renderFeed() {
+      feed.innerHTML = '';
+      let filtered = reports.filter(r => {
+        if (filterCity.value !== 'Todas' && r.city !== filterCity.value) return false;
+        if (filterNeighborhood.value !== 'Todos' && r.neighborhood !== filterNeighborhood.value) return false;
+        if (filterSearch.value && !(`${r.title} ${r.description}`.toLowerCase().includes(filterSearch.value.toLowerCase()))) return false;
+        return true;
+      });
 
-            // 🚀 Aqui tu pode adicionar o código do Firebase Realtime Database
-        }
+      filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        filterCity.onchange = () => renderFeed();
-        filterNeighborhood.onchange = () => renderFeed();
-        filterSearch.oninput = () => renderFeed();
-        clearFilters.onclick = () => {
-            filterCity.value = 'Todas';
-            filterNeighborhood.value = 'Todos';
-            filterSearch.value = '';
-            renderFeed();
-        }
+      if (filtered.length === 0) {
+        feed.innerHTML = '<div class="col-span-full text-center text-gray-500 p-6 bg-white rounded-xl shadow-sm border border-gray-200">Nenhuma reclamação encontrada</div>';
+        return;
+      }
 
-        // Inicial
-        renderFeed();
-    </script>
+      filtered.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-xl shadow-sm hover:shadow-md transition p-4 flex flex-col justify-between border border-gray-100 animate-fadeIn';
+        card.innerHTML = `
+          <div>
+            <h3 class="font-semibold text-gray-800 text-sm mb-1">${r.title}</h3>
+            <p class="text-xs text-gray-600 line-clamp-2">${r.description}</p>
+          </div>
+          <div class="mt-3 flex justify-between items-center text-[10px] text-gray-500">
+            <span>${r.city} — ${r.neighborhood}</span>
+            <span class="px-2 py-0.5 rounded-full ${categoryColor(r.category)} text-[10px]">${r.category || 'Outros'}</span>
+          </div>
+          <div class="text-[9px] text-gray-400 mt-1">📅 ${r.createdAt}</div>
+        `;
+        feed.appendChild(card);
+      });
+
+      renderFiltersOptions();
+    }
+
+    function renderFiltersOptions() {
+      const cities = ['Todas', ...new Set(reports.map(r => r.city))];
+      filterCity.innerHTML = cities.map(c => `<option value="${c}">${c}</option>`).join('');
+
+      const neighborhoods = ['Todos', ...new Set(reports.filter(r => filterCity.value === 'Todas' ? true : r.city === filterCity.value).map(r => r.neighborhood))];
+      filterNeighborhood.innerHTML = neighborhoods.map(n => `<option value="${n}">${n}</option>`).join('');
+    }
+
+    // Eventos
+    btnAdd.onclick = () => modal.classList.add('modal-show');
+    cancelBtn.onclick = () => modal.classList.remove('modal-show');
+
+    form.onsubmit = e => {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      const city = document.getElementById('city').value;
+      const neighborhood = document.getElementById('neighborhood').value;
+      const category = document.getElementById('category').value;
+      const createdAt = new Date().toISOString().slice(0, 10);
+
+      const newReport = { title, description, city, neighborhood, category, createdAt };
+      reports.push(newReport);
+      saveReports();
+      renderFeed();
+      form.reset();
+      modal.classList.remove('modal-show');
+    }
+
+    filterCity.onchange = () => renderFeed();
+    filterNeighborhood.onchange = () => renderFeed();
+    filterSearch.oninput = () => renderFeed();
+    clearFilters.onclick = () => {
+      filterCity.value = 'Todas';
+      filterNeighborhood.value = 'Todos';
+      filterSearch.value = '';
+      renderFeed();
+    }
+
+    // Inicial
+    renderFeed();
+  </script>
 
 </body>
-
 
 </html>
